@@ -60,7 +60,7 @@ module Danthes
 
     # Sends the given message hash to the Faye server using Net::HTTP.
     def publish_message(message)
-      raise Error, "No server specified, ensure danthes.yml was loaded properly." unless config[:server]
+      raise Error, "No server specified, ensure danthes.yml was loaded properly." unless local_server_url
       url = URI.parse(local_server_url)
 
       form = Net::HTTP::Post.new(url.path.empty? ? '/' : url.path)

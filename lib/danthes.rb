@@ -12,16 +12,16 @@ module Danthes
   class << self
     attr_reader :config
     attr_accessor :env
-    
+
     # List of accepted options in config file
     ACCEPTED_KEYS = %w(adapter server secret_token mount signature_expiration timeout)
-    
+
     # List of accepted options in redis config file
     REDIS_ACCEPTED_KEYS = %w(host port password database namespace socket)
 
     # Default options
     DEFAULT_OPTIONS = {:mount => "/faye", :timeout => 60, :extensions => [FayeExtension.new]}
-    
+
     # Resets the configuration to the default
     # Set environment
     def startup
@@ -32,7 +32,7 @@ module Danthes
                ENV["RAILS_ENV"] || "development"
              end
     end
-    
+
     # Loads the configuration from a given YAML file
     def load_config(filename)
       yaml = ::YAML.load_file(filename)[env]
@@ -61,7 +61,7 @@ module Danthes
     # Sends the given message hash to the Faye server using Net::HTTP.
     def publish_message(message)
       raise Error, "No server specified, ensure danthes.yml was loaded properly." unless config[:server]
-      url = URI.parse(server_url)
+      url = URI.parse(local_server_url)
 
       form = Net::HTTP::Post.new(url.path.empty? ? '/' : url.path)
       form.set_form_data(:message => message.to_json)
@@ -81,15 +81,19 @@ module Danthes
       end
       message
     end
-    
-    def server_url
-      [config[:server], config[:mount].gsub(/^\//,'')].join('/')
+
+    def remote_server_url
+      [config[:remote_server], config[:mount].gsub(/^\//,'')].join('/')
     end
-    
+
+    def local_server_url
+      [config[:local_server], config[:mount].gsub(/^\//,'')].join('/')
+    end
+
     # Returns a subscription hash to pass to the PrivatePub.sign call in JavaScript.
     # Any options passed are merged to the hash.
     def subscription(options = {})
-      sub = {:server => server_url, :timestamp => (Time.now.to_f * 1000).round}.merge(options)
+      sub = {:server => remote_server_url, :timestamp => (Time.now.to_f * 1000).round}.merge(options)
       sub[:signature] = Digest::SHA1.hexdigest([config[:secret_token], sub[:channel], sub[:timestamp]].join)
       sub
     end

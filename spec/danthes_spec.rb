@@ -4,7 +4,7 @@ describe Danthes do
   before(:each) do
     Danthes.startup
   end
-  
+
   let(:config) { Danthes.config }
 
   it "defaults server to nil" do
@@ -78,7 +78,7 @@ describe Danthes do
     subscription[:channel].should eq("hello")
     subscription[:server].should eq("server/faye")
   end
-  
+
   it "returns full server url from server and mount configs" do
     Danthes.config[:server] = "server.com"
     Danthes.config[:mount] = '/faye'

@@ -14,7 +14,7 @@ module Danthes
     attr_accessor :env
 
     # List of accepted options in config file
-    ACCEPTED_KEYS = %w(adapter server secret_token mount signature_expiration timeout)
+    ACCEPTED_KEYS = %w(adapter local_server remote_server secret_token mount signature_expiration timeout)
 
     # List of accepted options in redis config file
     REDIS_ACCEPTED_KEYS = %w(host port password database namespace socket)
